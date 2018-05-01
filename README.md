@@ -1,2 +1,3 @@
 # snstxtr
-Simple HTTP facade service to send an SMS using AWS SNS
+
+Send SMS using SNS by CLI or a simple web service.
