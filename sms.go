@@ -85,8 +85,5 @@ func Send(message, number string) error {
 	service := sns.New(session.New(aws.NewConfig()))
 	sms := SMS{Service: service}
 
-	log.Debug(service)
-	log.Debug(sms)
-
 	return sms.Send(message, number)
 }
