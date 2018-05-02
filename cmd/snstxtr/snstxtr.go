@@ -3,7 +3,7 @@ package main
 import (
 	"os"
 
-	"github.com/flaccid/snstxtr/sms"
+	"github.com/flaccid/snstxtr"
 	"github.com/urfave/cli"
 
 	log "github.com/Sirupsen/logrus"
@@ -18,8 +18,17 @@ func beforeApp(c *cli.Context) error {
 		log.SetLevel(log.DebugLevel)
 	}
 
-	if c.NArg() < 1 {
+	// check if needed aws variables are available
+	if len(c.String("aws-region")) < 1 || len(c.String("aws-access-key-id")) < 1 || len(c.String("aws-secret-access-key")) < 1 {
+		log.Fatal("insufficient aws credentials")
+	}
+
+	if c.NArg() < 1 && !c.Bool("daemon") {
 		log.Fatal("message contents required")
+	}
+
+	if len(c.String("phone")) < 1 && !c.Bool("daemon") {
+		log.Fatal("phone number required")
 	}
 
 	return nil
@@ -34,7 +43,7 @@ func main() {
 	app.Before = beforeApp
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:   "phone",
+			Name:   "phone,n",
 			Usage:  "phone number to send sms to",
 			EnvVar: "PHONE",
 		},
@@ -54,6 +63,10 @@ func main() {
 			EnvVar: "AWS_SECRET_ACCESS_KEY",
 		},
 		cli.BoolFlag{
+			Name:  "daemon",
+			Usage: "run in daemon mode (web service)",
+		},
+		cli.BoolFlag{
 			Name:  "dry",
 			Usage: "run in dry mode",
 		},
@@ -66,9 +79,13 @@ func main() {
 }
 
 func start(c *cli.Context) error {
-	log.Info("send to ", c.String("phone"), " message: ", c.Args().Get(0))
-	err := sms.Send(c.Args().Get(0), c.String("phone"))
-	log.Info(err)
+	if c.Bool("daemon") {
+		snstxtr.Serve()
+	} else {
+		log.Info("send to ", c.String("phone"), " message: ", c.Args().Get(0))
+		err := snstxtr.Send(c.Args().Get(0), c.String("phone"))
+		log.Info(err)
+	}
 
 	return nil
 }

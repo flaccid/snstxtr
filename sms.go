@@ -1,8 +1,9 @@
-// Package sms provides a small wrapper around AWS SNS SMS support.
-package sms
+package snstxtr
 
 import (
 	"fmt"
+
+	log "github.com/Sirupsen/logrus"
 
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/session"
@@ -21,13 +22,13 @@ const (
 	// Transactional messages are critical messages that support
 	// customer transactions, such as one-time passcodes for multi-factor authentication.
 	// Amazon SNS optimizes the message delivery to achieve the highest reliability.
-	Transactional = "Transactional"
+	Transactional Type = "Transactional"
 )
 
 // Defaults.
 var (
-	DefaultMaxPrice = 0.25
-	DefaultType     = Promotional
+	DefaultMaxPrice = 0.99
+	DefaultType     = Transactional
 )
 
 // SMS configures an SNS SMS client.
@@ -83,5 +84,9 @@ func (s *SMS) Send(message, number string) error {
 func Send(message, number string) error {
 	service := sns.New(session.New(aws.NewConfig()))
 	sms := SMS{Service: service}
+
+	log.Debug(service)
+	log.Debug(sms)
+
 	return sms.Send(message, number)
 }
