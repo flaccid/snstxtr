@@ -1,0 +1,26 @@
+version: '2'
+services:
+  snstxtr:
+    image: flaccid/snstxtr
+    environment:
+      AWS_REGION: ap-southeast-2
+      AWS_ACCESS_KEY_ID: foo
+      AWS_SECRET_ACCESS_KEY: secretbar
+    stdin_open: true
+    tty: true
+    command:
+    - --daemon
+    - -d
+    labels:
+      io.rancher.container.pull_image: always
+  lb:
+    image: rancher/lb-service-haproxy:v0.9.1
+    ports:
+    - 8013:8013/tcp
+    labels:
+      io.rancher.container.agent.role: environmentAdmin,agent
+      io.rancher.container.agent_service.drain_provider: 'true'
+      tier: private
+      io.rancher.scheduler.affinity:host_label: tier=private
+      io.rancher.container.create_agent: 'true'
+      io.rancher.scheduler.global: 'true'
