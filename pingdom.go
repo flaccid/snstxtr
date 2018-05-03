@@ -31,7 +31,7 @@ func pingdomHandler(w http.ResponseWriter, r *http.Request) {
 			msg := "pingdom: " + payload["check_name"].(string) + " is now " + payload["current_state"].(string)
 			sendText(phone, msg, w)
 		} else {
-			sendText(payload["phone"].(string), payload["msg"].(string), w)
+			sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
 		}
 	default:
 		sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
