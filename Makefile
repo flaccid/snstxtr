@@ -8,9 +8,7 @@ WORKING_DIR := $(shell pwd)
 
 .DEFAULT_GOAL := build
 
-.PHONY: build push
-
-release:: build push ## Builds and pushes the docker image to the registry
+.PHONY: build-static-linux
 
 push:: ## Pushes the docker image to the registry
 		@docker push $(IMAGE_TAG)
@@ -38,6 +36,8 @@ docker-build:: ## Builds the docker image locally
 
 docker-push:: ## Pushes the docker image to the registry
 		@docker push $(IMAGE_TAG)
+
+docker-release:: docker-build docker-push ## Builds and pushes the docker image to the registry
 
 # A help target including self-documenting targets (see the awk statement)
 define HELP_TEXT
