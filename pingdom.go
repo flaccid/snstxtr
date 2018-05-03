@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"io/ioutil"
 	"net/http"
-	"os"
 )
 
 func pingdomHandler(w http.ResponseWriter, r *http.Request) {
@@ -16,6 +15,14 @@ func pingdomHandler(w http.ResponseWriter, r *http.Request) {
 		// pingdom only supports webhook POST payloads
 		sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
 	case "POST":
+		recipients := r.URL.Query().Get("recipients")
+
+		// check for required query params first
+		if len(recipients) < 1 {
+			sendResponse(w, http.StatusBadRequest, `{"error": "insufficient parameters", "reason": "no recipients provided"}`)
+			return
+		}
+
 		var bodyBytes []byte
 		var payload map[string]interface{}
 
@@ -26,10 +33,8 @@ func pingdomHandler(w http.ResponseWriter, r *http.Request) {
 
 		// this should be a pingdom payload
 		if _, ok := payload["check_id"]; ok {
-			// we rely on this being set in the env as its not included in the payload
-			phone := os.Getenv("PHONE")
 			msg := "pingdom: " + payload["check_name"].(string) + " is now " + payload["current_state"].(string)
-			sendText(phone, msg, w)
+			sendText(recipients, msg, w)
 		} else {
 			sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
 		}
