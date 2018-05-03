@@ -31,6 +31,9 @@ func beforeApp(c *cli.Context) error {
 		log.Fatal("phone number required")
 	}
 
+	// explicitly set the phone number in the env in case using an incoming webhook
+	os.Setenv("PHONE", c.String("phone"))
+
 	return nil
 }
 
