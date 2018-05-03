@@ -25,16 +25,24 @@ func sendResponse(w http.ResponseWriter, status int, body string) {
 }
 
 func sendText(phone string, msg string, w http.ResponseWriter) {
-	log.Debug("sending sms to ", phone)
+	log.WithFields(log.Fields{
+		"phone": phone,
+		"msg": msg,
+	}).Debug("sending sms")
+
 	err := Send(msg, phone)
 	if err != nil {
-		log.Error(err)
+		log.WithFields(log.Fields{
+			"info": err,
+		}).Error("send result")
 		json := "{\"error\": \"" + err.Error() + "\"}"
 		sendResponse(w, http.StatusInternalServerError, json)
 	} else {
-		log.Info(err)
 		sendResponse(w, http.StatusOK, `{"status": "sent"}`)
 	}
+	log.WithFields(log.Fields{
+		"info": err,
+	}).Debug("send result")
 }
 
 func reqHandler(w http.ResponseWriter, r *http.Request, allowGet bool) {
@@ -69,13 +77,14 @@ func reqHandler(w http.ResponseWriter, r *http.Request, allowGet bool) {
 		r.Body = ioutil.NopCloser(bytes.NewBuffer(bodyBytes))
 		json.Unmarshal(bodyBytes, &payload)
 
+		// assume this is a pingdom payload
 		if _, ok := payload["check_id"]; ok {
 			// we rely on this being set in the env as its not included in the payload
 			phone := os.Getenv("PHONE")
 			msg := "pingdom: " + payload["check_name"].(string) + " is now " + payload["current_state"].(string)
 			sendText(phone, msg, w)
 		} else {
-			sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
+			sendText(payload["phone"].(string), payload["msg"].(string), w)
 		}
 	default:
 		sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
