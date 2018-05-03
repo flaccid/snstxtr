@@ -70,6 +70,11 @@ func main() {
 			Usage: "run in daemon mode (web service)",
 		},
 		cli.BoolFlag{
+			Name:  "allow-get",
+			Usage: "allow get requests in daemon mode",
+		},
+		// not yet implemented
+		cli.BoolFlag{
 			Name:  "dry",
 			Usage: "run in dry mode",
 		},
@@ -83,7 +88,7 @@ func main() {
 
 func start(c *cli.Context) error {
 	if c.Bool("daemon") {
-		snstxtr.Serve()
+		snstxtr.Serve(c.Bool("allow-get"))
 	} else {
 		log.Info("send to ", c.String("phone"), " message: ", c.Args().Get(0))
 		err := snstxtr.Send(c.Args().Get(0), c.String("phone"))

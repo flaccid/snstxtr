@@ -11,11 +11,21 @@ const (
 	listenPort = 8080
 )
 
-func Serve() {
+var (
+	w http.ResponseWriter
+	r *http.Request
+)
+
+func Serve(allowGet bool) {
 	log.Printf("initialize snstxtr")
 	log.Debug("debug logging enabled")
+	if allowGet {
+		log.Debug("allowing get requests")
+	}
 
-	http.HandleFunc("/", reqHandler)
+	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		reqHandler(w, r, allowGet)
+	})
 	http.HandleFunc("/health", healthCheckHandler)
 	http.HandleFunc("/health/", healthCheckHandler)
 

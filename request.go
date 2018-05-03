@@ -37,7 +37,7 @@ func sendText(phone string, msg string, w http.ResponseWriter) {
 	}
 }
 
-func reqHandler(w http.ResponseWriter, r *http.Request) {
+func reqHandler(w http.ResponseWriter, r *http.Request, allowGet bool) {
 	logRequest(r)
 
 	// we only want to process real requests i.e. reject robots, favicon etc.
@@ -48,13 +48,17 @@ func reqHandler(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		phone := r.URL.Query().Get("phone")
-		msg := r.URL.Query().Get("msg")
+		if allowGet {
+			phone := r.URL.Query().Get("phone")
+			msg := r.URL.Query().Get("msg")
 
-		if len(phone) < 1 || len(msg) < 1 {
-			sendResponse(w, http.StatusBadRequest, `{"error": "insufficient parameters"}`)
+			if len(phone) < 1 || len(msg) < 1 {
+				sendResponse(w, http.StatusBadRequest, `{"error": "insufficient parameters"}`)
+			} else {
+				sendText(phone, msg, w)
+			}
 		} else {
-			sendText(phone, msg, w)
+			sendResponse(w, http.StatusMethodNotAllowed, `{"error": "method not allowed or supported"}`)
 		}
 	case "POST":
 		var bodyBytes []byte
