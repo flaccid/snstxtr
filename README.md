@@ -17,7 +17,12 @@ These can be used as an alternative or in conjunction with the applicable CLI op
 
 ## Daemon Mode
 
-Example:
+```
+POST /
+{"phone": "+61406650430", "msg": "hello, there."}
+```
+
+If you use `--allow-get` then you can lazily send SMS:
 
 ```
 GET /?phone=%2B61406650430&msg=Hello%2C%20there.
