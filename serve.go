@@ -12,6 +12,7 @@ func Serve() {
 
 	http.HandleFunc("/", reqHandler)
 	http.HandleFunc("/health", healthCheckHandler)
+	http.HandleFunc("/health/", healthCheckHandler)
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
 		log.Fatalf("http; %v", err)
