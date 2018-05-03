@@ -28,6 +28,8 @@ func Serve(allowGet bool) {
 	})
 	http.HandleFunc("/health", healthCheckHandler)
 	http.HandleFunc("/health/", healthCheckHandler)
+	http.HandleFunc("/pingdom-webhook", pingdomHandler)
+	http.HandleFunc("/pingdom-webhook/", pingdomHandler)
 
 	log.Info("listening for requests on :" + fmt.Sprintf("%v", listenPort))
 	if err := http.ListenAndServe(":"+fmt.Sprintf("%v", listenPort), nil); err != nil {
