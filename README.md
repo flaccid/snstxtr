@@ -19,16 +19,19 @@ These can be used as an alternative or in conjunction with the applicable CLI op
 
 ```
 POST /
-{"phone": "+61406650430", "msg": "hello, there."}
+{"recipients": ["+61406650430"], "msg": "hello, there."}
 ```
 
-If you use `--allow-get` then you can lazily send SMS:
+If you use `--allow-get` then you can lazily send SMS (recipients are comma separated):
 
 ```
-GET /?phone=%2B61406650430&msg=Hello%2C%20there.
+GET /?recipients=%2B61406650430&msg=Hello%2C%20there.
 ```
 
 ### Pingdom Webhooks
+
+In this scenario, its not possible to send the recipients from Pingdom in the
+`POST` payload, so we support it in the `GET` query string directly.
 
 ```
 POST /pingdom-webhook/?recipients=%2B61406650430

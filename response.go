@@ -13,23 +13,30 @@ func sendResponse(w http.ResponseWriter, status int, body string) {
 	io.WriteString(w, body)
 }
 
-func sendText(phone string, msg string, w http.ResponseWriter) {
+func sendText(recipients []string, msg string, w http.ResponseWriter) {
+	var sendFail bool
+	var err error
+
 	log.WithFields(log.Fields{
-		"phone": phone,
+		"recipients": recipients,
 		"msg":   msg,
 	}).Debug("sending sms")
 
-	err := Send(msg, phone)
-	if err != nil {
+	// send sms to each recipient
+	for _, phone := range recipients {
+		err = Send(msg, phone)
+		if err != nil {
+			sendFail = true
+		}
 		log.WithFields(log.Fields{
 			"info": err,
-		}).Error("send result")
+		}).Debug("send result")
+	}
+
+	if sendFail {
 		json := "{\"error\": \"" + err.Error() + "\"}"
 		sendResponse(w, http.StatusInternalServerError, json)
 	} else {
-		sendResponse(w, http.StatusOK, `{"status": "sent"}`)
+		sendResponse(w, http.StatusOK, `{"status": "all-sent"}`)
 	}
-	log.WithFields(log.Fields{
-		"info": err,
-	}).Debug("send result")
 }
