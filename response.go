@@ -37,6 +37,6 @@ func sendText(recipients []string, msg string, w http.ResponseWriter) {
 		json := "{\"error\": \"" + err.Error() + "\"}"
 		sendResponse(w, http.StatusInternalServerError, json)
 	} else {
-		sendResponse(w, http.StatusOK, `{"status": "all-sent"}`)
+		sendResponse(w, http.StatusCreated, `{"status": "all-sent"}`)
 	}
 }
