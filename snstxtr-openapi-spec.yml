@@ -1,0 +1,80 @@
+openapi: 3.0.0
+
+info:
+  version: '0.0.1-dev'
+  title: Scentre Group SMS API
+  description: >-
+    This API is used by various Scentre Group systems to send SMS to
+    end users of any kind.
+  license:
+    name: Scentre Limited All Rights Reserved
+  contact:
+    name: Scentre Limited
+    url: 'https://scentregroup.com/'
+    email: digitalplatforms@scentregroup.com
+
+servers:
+  - url: https://api.scentregroup.io/v1/sms
+    description: 'Scentre Group SMS API production endpoint.'
+  - url: https://api.stg.scentregroup.io/v1/sms
+    description: 'Scentre Group SMS API staging endpoint.'
+  - url: https://api.dev.scentregroup.io/v1/sms
+    description: 'Scentre Group SMS API development endpoint.'
+
+paths:
+  /:
+    post:
+      summary: Send an SMS text message
+      requestBody:
+        description: Payload to send a text message to one ore more recipients.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipients:
+                  type: array
+                  items:
+                    type: string
+                msg:
+                  type: string
+                  items:
+                    type: string
+
+      responses:
+        '201':
+          description: Created
+  '/pingdom-webhook':
+    post:
+      summary: Webhook reciever from Pingdom
+      requestBody:
+        description: >-
+          Receives a webhook payload from Pingdom and sends correspending SMS
+          according to recipients specified in query string.
+
+          See https://www.pingdom.com/resources/webhooks for expected payloads.
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+      responses:
+        '201':
+          description: Created
+  /health:
+    get:
+      summary: Basic health check
+      responses:
+        '200':
+          description: Healthy
+
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: api_key
+
+security:
+  - ApiKeyAuth: []
