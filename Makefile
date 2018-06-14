@@ -26,7 +26,7 @@ run:: ## Runs the docker image locally
 build-static-linux:: ## Builds a static linux binary
 		@CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
 			go build \
-			-o bin/rsg \
+			-o bin/snstxtr \
 			-a -ldflags '-extldflags "-static"' \
 				cmd/snstxtr/snstxtr.go
 
